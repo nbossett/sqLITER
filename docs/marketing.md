@@ -14,4 +14,4 @@ sqLITER is a thin, C++ wrapper to the excellent SQLite database library.  The SQ
 * **Cross-platform:** From smartphone to server, you can share data from your C++ Application.
 * **GPL Lesser (Library) License:** Fully open source with no royalties.
 
-If sqLITER is useful to you, please consider making a donation to [http://www.sqlite.org](SQLite) or to [http://www.sqliter.org](sqLITER).
+If sqLITER is useful to you, please consider making a donation to (http://www.sqlite.org)[SQLite] or to (http://www.sqliter.org)[sqLITER].
