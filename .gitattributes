@@ -15,3 +15,9 @@
 *.PDF	 diff=astextplain
 *.rtf	 diff=astextplain
 *.RTF	 diff=astextplain
+
+#tell github (Linguist) to ignore sqlite3 itself when deciding what language this repository represents
+#should be C++, not C
+src/sqlite3.c linguist-vendored
+src/sqlite3.h linguist-vendored
+src/sqlite3.h linguist-vendored
