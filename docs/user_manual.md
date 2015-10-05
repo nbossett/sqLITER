@@ -85,7 +85,7 @@ The header file sqliter.h should be consulted for full details of calling parame
 
 The following example C++ code creates a database of 2D points, adds the points (1,2) and (3,5) and then retrieves and displays those points.  Note that running the demonstration code twice without deleting the database file will fail because the database will already exist, causing the createdb call to fail.
 
-...
+```
 #include <string>
 #include <iostream>
 
@@ -147,7 +147,7 @@ int i;
 	db.closedb();
 	std::cout << "basic example run successfully\r\n";
 }
-...
+```
 
 ## Feature Requests and Bug Reports
 
