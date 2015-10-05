@@ -1,7 +1,7 @@
 # sqLITER
 C++ Wrapper for SQLite (Embedded Database Library)
 
-sqLITER is a simplified wrapper to access the widely used SQLite database library which is written on a C API model.
+sqLITER is a simplified wrapper to access the widely used SQLite database library which is written on a C API model.  Licensing is GPL Lesser (Library) License v3.0.
 
 This wrapper preserves that basic call/return value API philosophy but will eventually raise exceptions as an option.
 
