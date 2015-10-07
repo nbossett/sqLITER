@@ -8,6 +8,7 @@
 //\user preferences
 
 #include <string>
+#include <sstream> //necessary only for a workaround to std::to_string which an older version of G++ doesn't support
 #include <vector>
 #include <fstream>
 
@@ -161,8 +162,10 @@ private:
 
 	inline void log(std::string &str);
 	inline void log(const char *str);
-	inline void log(std::string &str, int sqlite_errorcode);
-	inline void log(const char *str, int sqlite_errorcode);
+	//inline void log(std::string &str, int sqliter_errorcode);
+	//inline void log(const char *str, int sqliter_errorcode);
+	inline void log(const char *str, int sqliter_errorcode, int sqlite_errorcode);
+	inline void log(std::string &str, int sqliter_errorcode, int sqlite_errorcode);
 
 	sqlite3 *db;
 
@@ -182,4 +185,50 @@ private:
 };
 
 void geterrorname(int code, std::string &str);
+
+
+//INTERNAL USE, THESE ARE NOT RETURNED BY THE sqLITER LIBRARY
+//THEY ARE USED IN LOG FILES AND SUCH FOR ERROR TRACKING INSIDE THE LIBRARY
+//the names and values are dependent on the particular implementation at the time
+//and so may change from version to version
+#define SQLITER_ERROR_NONE 0
+#define SQLITER_ERROR_OTHER 1
+
+#define SQLITER_ERROR_CREATEDB_FAILEDOPEN 101
+
+#define SQLITER_ERROR_OPENORCREATE_FAILEDSQLITE3OPEN 201
+#define SQLITER_ERROR_OPENORCREATE_FAILEDSQLITE3SETBUSYTIMEOUT 201
+
+#define SQLITER_ERROR_REMOVEDB_FAILEDSTDREMOVE 301
+
+#define SQLITER_ERROR_BIND_OBTAININDEX 400
+#define SQLITER_ERROR_BIND_INT64 401
+#define SQLITER_ERROR_BIND_DOUBLE 402
+#define SQLITER_ERROR_BIND_TEXT 403
+#define SQLITER_ERROR_BIND_BLOB 404
+#define SQLITER_ERROR_BIND_NULL 403
+#define SQLITER_ERROR_BIND_BADTYPE 404
+
+#define SQLITER_ERROR_COMPILESQL_NULLDB 501
+#define SQLITER_ERROR_COMPILESQL_NULLSTATEMENT 501
+#define SQLITER_ERROR_COMPILESQL_FAILEDPREPARE 501
+
+#define SQLITER_ERROR_COMPILESTATEMENT_FAILCOMPILESQL 601
+#define SQLITER_ERROR_COMPILESTATEMENT_FAILBIND 602
+
+#define SQLITER_ERROR_RUNSTEP_FAILSTEPSTATEMENT 701
+
+#define SQLITER_ERROR_STEPSTATEMENT_DBNULL 801
+#define SQLITER_ERROR_STEPSTATEMENT_FAILSQLITE3STEP 802
+#define SQLITER_ERROR_STEPSTATEMENT_BADTYPE 803
+
+#define SQLITER_ERROR_RUNSINGLESTEPSTATEMENT_FAILED_RUNSTEP 901
+
+#define SQLITER_ERROR_FINALIZESTATEMENT_DBNULL 1001
+#define SQLITER_ERROR_FINALIZESTATEMENT_STATEMENTNULL 1002
+
+#define SQLITER_ERROR_CLOSEDB_FAILSQLITE3CLOSE 1101
+
+#define SQLITER_ERROR_STARTLOG_FAILOPEN 1201
+
 
