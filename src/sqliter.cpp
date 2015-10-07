@@ -661,15 +661,21 @@ inline void csqliter::log(std::string &str, int sqliter_errorcode, int sqlite_er
 }
 
 inline void csqliter::log(const char *str, int sqliter_errorcode, int sqlite_errorcode) {
+//work around older g++'s (4.2.1) not supporting std::string
 	std::string errstr;
 	std::string logstr;
+	std::ostringstream strstrm;
 
 	geterrorname(sqlite_errorcode, errstr);
 	logstr = str;
 	logstr += "\t";
-	logstr += std::to_string(sqliter_errorcode);
+	//logstr += std::to_string(sqliter_errorcode);
+	strstrm << sqliter_errorcode;
+	logstr += strstrm.str();strstrm.str("");
 	logstr += "\t";
-	logstr += std::to_string(sqlite_errorcode);
+	//logstr += std::to_string(sqlite_errorcode);
+	strstrm << sqliter_errorcode;
+	logstr += strstrm.str();strstrm.str("");
 	logstr += "\t";
 	logstr += errstr;
 	logstr += "\n";
