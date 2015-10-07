@@ -69,7 +69,7 @@ dbresulttype csqliter::openorcreate(std::string &fullpath, bool create) {
 		break;
 	default:
 		db = NULL;
-		log("\tsqlite3_open failed", rc);
+		log("\tsqlite3_open failed", SQLITER_ERROR_OTHER, rc);
 		return(otherdberror);
 	}
 
@@ -79,7 +79,7 @@ dbresulttype csqliter::openorcreate(std::string &fullpath, bool create) {
 		return(successdb);
 		break;
 	default:
-		log("\tsqlite3_busy_timeout failed", rc);
+		log("\tsqlite3_busy_timeout failed", SQLITER_ERROR_OTHER, rc);
 		return(otherdberror);
 	}
 
@@ -375,10 +375,10 @@ int rc;
 	case SQLITE_OK:
 		return(successdb);
 	case SQLITE_BUSY:
-		log("\tdb is busy");
+		log("\tdb is busy", SQLITER_ERROR_OTHER,rc);
 		return(busydberror);
 	default:
-		log("\tfailed",rc);
+		log("\tfailed", SQLITER_ERROR_OTHER,rc);
 		return(otherdberror);
 	}
 }
@@ -397,7 +397,7 @@ unsigned int i;
 	rval = compilesql();
 	if (rval != successdb) {
 		finalizestatement();
-		log("\tcompilesql failed",rval);
+		log("\tcompilesql failed", SQLITER_ERROR_OTHER,rval);
 		return(rval);
 	}
 
@@ -405,7 +405,7 @@ unsigned int i;
 		rslt = bindparameter(valsin[i]);
 		if (rslt) {
 			finalizestatement();
-			log("\tbind error\n");
+			log("\tbind error\n", SQLITER_ERROR_OTHER,rslt);
 			return(binddberror);
 		}
 	}
@@ -630,11 +630,11 @@ inline void csqliter::log(const char *str) {
 	}
 }
 
-inline void csqliter::log(std::string &str, int sqlite_errorcode) {
-	log(str.c_str(), sqlite_errorcode);
+inline void csqliter::log(std::string &str, int sqliter_errorcode, int sqlite_errorcode) {
+	log(str.c_str(),sqliter_errorcode, sqlite_errorcode);
 }
 
-inline void csqliter::log(const char *str, int sqlite_errorcode) {
+inline void csqliter::log(const char *str, int sqliter_errorcode, int sqlite_errorcode) {
 	std::string errstr;
 	std::string logstr;
 

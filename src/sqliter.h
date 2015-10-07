@@ -161,8 +161,10 @@ private:
 
 	inline void log(std::string &str);
 	inline void log(const char *str);
-	inline void log(std::string &str, int sqlite_errorcode);
-	inline void log(const char *str, int sqlite_errorcode);
+	//inline void log(std::string &str, int sqliter_errorcode);
+	//inline void log(const char *str, int sqliter_errorcode);
+	inline void log(const char *str, int sqliter_errorcode, int sqlite_errorcode);
+	inline void log(std::string &str, int sqliter_errorcode, int sqlite_errorcode);
 
 	sqlite3 *db;
 
@@ -183,3 +185,14 @@ private:
 
 void geterrorname(int code, std::string &str);
 
+
+//INTERNAL USE, THESE ARE NOT RETURNED BY THE sqLITER LIBRARY
+//THEY ARE USED IN LOG FILES AND SUCH FOR ERROR TRACKING INSIDE THE LIBRARY
+
+#define SQLITER_ERROR_NONE 0
+#define SQLITER_ERROR_OTHER 1
+
+#define SQLITER_ERROR_BIND_OBTAININDEX 1000
+#define SQLITER_ERROR_BIND_INT64 1001
+#define SQLITER_ERROR_BIND_DOUBLE 1002
+#define SQLITER_ERROR_BIND_TEXT 1003
