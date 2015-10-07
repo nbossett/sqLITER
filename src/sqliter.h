@@ -8,7 +8,6 @@
 //\user preferences
 
 #include <string>
-#include <sstream> //necessary only for a workaround to std::to_string which an older version of G++ doesn't support
 #include <vector>
 #include <fstream>
 
