@@ -7,6 +7,8 @@ This wrapper preserves that basic call/return value API philosophy but will even
 
 The intent is to provide the power of SQLite in a very accessible form that can have a user up and running successfully in minutes.
 
+All of the source code, documentation, and technical information is here.  The [sqLITER project homepage](http://sqliter.org) will also grow over time.
+
 A user manual, more thorough explanations of the design philosophy, and code samples may be found in the docs folder.  Documentation contributed by [Tim Marsolais](http://www.tmarsolais.com).  
 
 This project grew out of personal needs; I hope that others may find it as useful.  Many thanks to the SQLite folks for their outstanding work!
