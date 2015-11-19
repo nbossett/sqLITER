@@ -16,15 +16,34 @@ csqliter::~csqliter(void)
 
 dbresulttype csqliter::openexistingdb(std::string &fullpath) {
 //DB must exist for success (won't create a new one)
-	return(openorcreate(fullpath, false));
+dbresulttype rslt;
+	
+	log("openexistingdb(std::string)");
+
+	rslt = openorcreate(fullpath,false);
+
+	if (rslt) {
+		//detailed failure already logged as part of the openorcreate call
+		log("\tFailure in openorcreate");
+	}
+
+	return(rslt);
 }
 
 dbresulttype csqliter::openexistingdb(const char *fullpath) {
 //DB must already exist for success (won't create a new one)
+dbresulttype rslt;
+
 	std::string full;
-	log("opendb - char * piping to str");
+	log("opendb(const char *)");
 	full = fullpath;
-	return(openexistingdb(full));
+	rslt = openexistingdb(full);
+
+	if (rslt) {
+		//just a pipe to the string version but log it anyway
+		log("\tFailure in opendb");
+	}
+	return(rslt);
 }
 
 dbresulttype csqliter::createdb(std::string &fullpath) {
@@ -32,20 +51,37 @@ dbresulttype csqliter::createdb(std::string &fullpath) {
 	//so, try opening first, if that fails try creating.  If opening succeeds, it's a failure
 	//from our point of view
 	dbresulttype rslt;
+	log("createdb(std::string)");
 	rslt = openorcreate(fullpath, false);
 	if (!rslt) {
 		//that should not have worked
 		closedb();
-		log("createdb failed on calling openorcreate",SQLITER_ERROR_CREATEDB_FAILEDOPEN,SQLITER_ERROR_NONE);
+		log("\tcreatedb failed on calling openorcreate",SQLITER_ERROR_CREATEDB_FAILEDOPEN,SQLITER_ERROR_NONE);
 		return(otherdberror);
 	}
-	return(openorcreate(fullpath, true));
+	rslt = openorcreate(fullpath,true);
+
+	if (rslt) {
+		log("\tcreatedb failed on calling openorcreate(std::string, bool)");
+	}
+
+	return(rslt);
 }
 
 dbresulttype csqliter::createdb(const char *fullpath) {
 std::string str;
+dbresulttype rslt;
+
 	str = fullpath;
-	return(createdb(str));
+
+	log("createdb(cont char *)");
+	rslt = createdb(str);
+
+	if (rslt) {
+		log("\tFailure in createdb");
+	}
+
+	return(rslt);
 }
 
 dbresulttype csqliter::openorcreate(std::string &fullpath, bool create) {
@@ -53,9 +89,7 @@ dbresulttype csqliter::openorcreate(std::string &fullpath, bool create) {
 	//	between opening with the possibility of creation or opening without the possibility of creating
 	int flags;
 	int rc;
-	log("openorcreate:");
-	log(fullpath.c_str());
-	log("\n");
+	log("openorcreate(std::string, bool)");
 
 	if (create) {
 		flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE;
@@ -88,11 +122,9 @@ dbresulttype csqliter::openorcreate(std::string &fullpath, bool create) {
 
 dbresulttype csqliter::removedatabase(const char *fullpath) { 
 //std::remove is only defined in terms of success or failure, not detailed error codes
-	log("removedatabase:");
-	log(fullpath);
-	log("\n");
+	log("removedatabase(const char *)");
 	if (std::remove(fullpath)) {
-		log("\tstd::remove failed",SQLITER_ERROR_REMOVEDB_FAILEDSTDREMOVE,0);
+		log("\tremovedatabase failed, std::remove failed",SQLITER_ERROR_REMOVEDB_FAILEDSTDREMOVE,0);
 		return(otherdberror);
 	} else {
 		return(successdb);
@@ -100,20 +132,29 @@ dbresulttype csqliter::removedatabase(const char *fullpath) {
 }
 
 dbresulttype csqliter::removedatabase(std::string &fullpath) {
-	return(removedatabase(fullpath.c_str()));
+dbresulttype rslt;
+	log("removedatabase(std::string)");
+	rslt = removedatabase(fullpath.c_str());
+	if (rslt) {
+		log("\tFailure in removedatabase");
+	}
+	return(rslt);
 }
 
 
 sqlite3 *csqliter::getdbhandle() {
+	log("getdbhandle");
 	return(db);
 }
 
 void csqliter::setdbhandle(sqlite3 *dbhandle) {
+	log("setdbhandle");
 	finalizestatement();
 	db = dbhandle;
 }
 
 void csqliter::bindstr(std::string &name, std::string &arg) {
+	log("bindstr(std::string, std::string)");
 	statementdirty = true;
 	valsin.resize(valsin.size()+1);
 	valsin[valsin.size()-1].name = name;
@@ -123,12 +164,14 @@ void csqliter::bindstr(std::string &name, std::string &arg) {
 
 void csqliter::bindstr(std::string &name, const char *arg) {
 std::string ar;
+	log("bindstr(std::string, const char *)");
 	ar = arg;
 	bindstr(name,ar);
 }
 
 void csqliter::bindstr(const char *name, std::string &arg) {
 std::string nam;
+	log("bindstr(const char *, std::string)");
 	nam = name;
 	bindstr(nam, arg);
 }
@@ -136,7 +179,8 @@ std::string nam;
 void csqliter::bindstr(const char *name, const char *arg) {
 std::string nam;
 std::string ar;
-
+	
+	log("bindstr(const char *, const char *)");
 	nam = name;
 	ar = arg;
 
@@ -145,6 +189,7 @@ std::string ar;
 }
 
 void csqliter::bindint(std::string &name, sqlite3_int64 arg) {//int arg) {
+	log("bindint(std::string, sqlite3_int64)");
 	statementdirty = true;
 
 	valsin.resize(valsin.size()+1);
@@ -155,13 +200,14 @@ void csqliter::bindint(std::string &name, sqlite3_int64 arg) {//int arg) {
 
 void csqliter::bindint(const char *name, sqlite3_int64 arg) {//int arg) {
 std::string nam;
-
+	log("bindint(const char *, sqlite3_int64)");
 	nam = name;
 	bindint(nam,arg);
 
 }
 
 void csqliter::bindfloat(std::string &name, double arg) {
+	log("bindfloat(std::string, double)");
 	statementdirty = true;
 
 	valsin.resize(valsin.size()+1);
@@ -173,13 +219,14 @@ void csqliter::bindfloat(std::string &name, double arg) {
 
 void csqliter::bindfloat(const char *name, double arg) {
 std::string nam;
-
+	log("bindfloat(const char *, double)");
 	nam = name;
 	bindfloat(nam, arg);
 
 }
 
 void csqliter::bindnull(std::string &name) {
+	log("bindnull(std::string)");
 	statementdirty = true;
 
 	valsin.resize(valsin.size() + 1);
@@ -189,13 +236,14 @@ void csqliter::bindnull(std::string &name) {
 
 void csqliter::bindnull(const char *name) {
 std::string nam;
-	
+	log("bindnull(const char *)");
 	nam = name;
 	bindnull(nam);
 
 }
 
 void csqliter::bindblob(std::string &name, unsignedcharvector &arg) {
+	log("bindblob(std::string, unsignedcharvector)");
 	statementdirty = true;
 
 	valsin.resize(valsin.size() + 1);
@@ -208,6 +256,7 @@ void csqliter::bindblob(std::string &name, unsignedcharvector &arg) {
 void csqliter::bindblob(const char *name, unsignedcharvector &arg) {
 std::string nam;
 
+	log("bindblob(const char *, unsignedcharvector)");
 	nam = name;
 	bindblob(nam,arg);
 
@@ -218,15 +267,16 @@ std::string name;
 int index;
 int rc;
 
-	log("bindparameter\n");
+	log("bindparameter(cdbparameter)");
 	if (db == NULL) {
+		log("\tbindparameter failed, database is NULL");
 		return(1);
 	}
 
 	name = ":" + param.name;
 	index = sqlite3_bind_parameter_index(litestmnt, name.c_str());
 	if (index == 0) {
-		log("\tsqlite3_bind_parameter_index failed",SQLITER_ERROR_BIND_OBTAININDEX,0);
+		log("\tbindparameter failed, sqlite3_bind_parameter_index failed with index of zero",SQLITER_ERROR_BIND_OBTAININDEX,0);
 		return(binddberror);
 	}
 
@@ -234,40 +284,40 @@ int rc;
 	case intdbval:
 		rc = sqlite3_bind_int64(litestmnt, index, param.val.ival);
 		if (rc != SQLITE_OK) {
-			log("\tsqlite3_bind_int64 failed",SQLITER_ERROR_BIND_INT64,rc);
+			log("\tbindparameter failed, sqlite3_bind_int64 failed",SQLITER_ERROR_BIND_INT64,rc);
 			return(binddberror);
 		}
 		break;
 	case floatdbval:
 		rc = sqlite3_bind_double(litestmnt, index, param.val.fval);
 		if (rc != SQLITE_OK) {
-			log("\tsqlite3_bind_double failed",SQLITER_ERROR_BIND_DOUBLE,rc);
+			log("\tbindparameter failed, sqlite3_bind_double failed",SQLITER_ERROR_BIND_DOUBLE,rc);
 			return(binddberror);
 		}
 		break;
 	case strdbval:
 		rc = sqlite3_bind_text(litestmnt, index, param.val.sval.c_str(), param.val.sval.length(), SQLITE_TRANSIENT);
 		if (rc != SQLITE_OK) {
-			log("\tsqlite3_bind_text failed",SQLITER_ERROR_BIND_TEXT,rc);
+			log("\tbindparameter failed, sqlite3_bind_text failed",SQLITER_ERROR_BIND_TEXT,rc);
 			return(binddberror);
 		}
 		break;
 	case blobdbval:
 		rc = sqlite3_bind_blob(litestmnt, index, &(param.val.blob[0]), param.val.blob.size(), SQLITE_TRANSIENT);
 		if (rc != SQLITE_OK) {
-			log("\tsqlite3_bind_blob failed",SQLITER_ERROR_BIND_BLOB,rc);
+			log("\tbindparameter failed, sqlite3_bind_blob failed",SQLITER_ERROR_BIND_BLOB,rc);
 			return(binddberror);
 		}
 		break;
 	case nulldbval:
 		rc = sqlite3_bind_null(litestmnt, index);
 		if (rc != SQLITE_OK) {
-			log("\tsqlite3_bind_blob failed",SQLITER_ERROR_BIND_NULL,rc);
+			log("\tbindparameter failed, sqlite3_bind_blob failed",SQLITER_ERROR_BIND_NULL,rc);
 			return(binddberror);
 		}
 		break;
 	default:
-		log("\tUnrecognized type of val",SQLITER_ERROR_BIND_BADTYPE, 0);
+		log("\tbindparameter failed, Unrecognized type of val",SQLITER_ERROR_BIND_BADTYPE, 0);
 		return(binddberror);
 	}
 
@@ -277,28 +327,34 @@ int rc;
 }
 
 void csqliter::pushvaltypeout(dbvaltype valtype) {
+	log("pushvaltypeout(dbvaltype)");
 	valtypesout.push_back(valtype);
 }
 
 void csqliter::pushvaltypesout(dbvaltype valtype) {
+	log("pushvaltypesout(1 dbvaltype)");
 	pushvaltypeout(valtype);
 }
 void csqliter::pushvaltypesout(dbvaltype typ1, dbvaltype typ2) {
+	log("pushvaltypesout(2 dbvaltype)");
 	pushvaltypeout(typ1);
 	pushvaltypeout(typ2);
 }
 void csqliter::pushvaltypesout(dbvaltype typ1, dbvaltype typ2, dbvaltype typ3) {
+	log("pushvaltypesout(3 dbvaltype)");
 	pushvaltypeout(typ1);
 	pushvaltypeout(typ2);
 	pushvaltypeout(typ3);
 }
 void csqliter::pushvaltypesout(dbvaltype typ1, dbvaltype typ2, dbvaltype typ3, dbvaltype typ4) {
+	log("pushvaltypesout(4 dbvaltype)");
 	pushvaltypeout(typ1);
 	pushvaltypeout(typ2);
 	pushvaltypeout(typ3);
 	pushvaltypeout(typ4);
 }
 void csqliter::pushvaltypesout(dbvaltype typ1, dbvaltype typ2, dbvaltype typ3, dbvaltype typ4, dbvaltype typ5) {
+	log("pushvaltypesout(5 dbvaltype)");
 	pushvaltypeout(typ1);
 	pushvaltypeout(typ2);
 	pushvaltypeout(typ3);
@@ -306,6 +362,7 @@ void csqliter::pushvaltypesout(dbvaltype typ1, dbvaltype typ2, dbvaltype typ3, d
 	pushvaltypeout(typ5);
 }
 void csqliter::pushvaltypesout(dbvaltype typ1, dbvaltype typ2, dbvaltype typ3, dbvaltype typ4, dbvaltype typ5, dbvaltype typ6) {
+	log("pushvaltypesout(6 dbvaltype)");
 	pushvaltypeout(typ1);
 	pushvaltypeout(typ2);
 	pushvaltypeout(typ3);
@@ -314,6 +371,7 @@ void csqliter::pushvaltypesout(dbvaltype typ1, dbvaltype typ2, dbvaltype typ3, d
 	pushvaltypeout(typ6);
 }
 void csqliter::pushvaltypesout(dbvaltype typ1, dbvaltype typ2, dbvaltype typ3, dbvaltype typ4, dbvaltype typ5, dbvaltype typ6, dbvaltype typ7) {
+	log("pushvaltypesout(7 dbvaltype)");
 	pushvaltypeout(typ1);
 	pushvaltypeout(typ2);
 	pushvaltypeout(typ3);
@@ -323,6 +381,7 @@ void csqliter::pushvaltypesout(dbvaltype typ1, dbvaltype typ2, dbvaltype typ3, d
 	pushvaltypeout(typ7);
 }
 void csqliter::pushvaltypesout(dbvaltype typ1, dbvaltype typ2, dbvaltype typ3, dbvaltype typ4, dbvaltype typ5, dbvaltype typ6, dbvaltype typ7, dbvaltype typ8) {
+	log("pushvaltypesout(8 dbvaltype)");
 	pushvaltypeout(typ1);
 	pushvaltypeout(typ2);
 	pushvaltypeout(typ3);
@@ -333,6 +392,7 @@ void csqliter::pushvaltypesout(dbvaltype typ1, dbvaltype typ2, dbvaltype typ3, d
 	pushvaltypeout(typ8);
 }
 void csqliter::pushvaltypesout(dbvaltype typ1, dbvaltype typ2, dbvaltype typ3, dbvaltype typ4, dbvaltype typ5, dbvaltype typ6, dbvaltype typ7, dbvaltype typ8, dbvaltype typ9) {
+	log("pushvaltypesout(9 dbvaltype)");
 	pushvaltypeout(typ1);
 	pushvaltypeout(typ2);
 	pushvaltypeout(typ3);
@@ -344,6 +404,7 @@ void csqliter::pushvaltypesout(dbvaltype typ1, dbvaltype typ2, dbvaltype typ3, d
 	pushvaltypeout(typ9);
 }
 void csqliter::pushvaltypesout(dbvaltype typ1, dbvaltype typ2, dbvaltype typ3, dbvaltype typ4, dbvaltype typ5, dbvaltype typ6, dbvaltype typ7, dbvaltype typ8, dbvaltype typ9, dbvaltype typ10) {
+	log("pushvaltypesout(10 dbvaltype)");
 	pushvaltypeout(typ1);
 	pushvaltypeout(typ2);
 	pushvaltypeout(typ3);
@@ -357,10 +418,12 @@ void csqliter::pushvaltypesout(dbvaltype typ1, dbvaltype typ2, dbvaltype typ3, d
 }
 
 void csqliter::setsql(std::string &sql) {
+	log("setsql(std::string)");
 	setsql(sql.c_str());
 }
 
 void csqliter::setsql(const char *sql) {
+	log("setsql(const char *)");
 	finalizestatement();
 	statementdirty = true;
 	stmntsql = sql;
@@ -369,15 +432,15 @@ void csqliter::setsql(const char *sql) {
 dbresulttype csqliter::compilesql() {
 int rc;
 
-	log("compilesql\n");
+	log("compilesql");
 
 	if (db == NULL) {
-		log("\tdb is null\n");
+		log("\tcompilesql failed, db is null");
 		return(otherdberror);
 	}
 
 	if (stmntsql == "") {
-		log("\tsql statement is null\n");
+		log("\tcompilesql failed, sql statement is null");
 		return(otherdberror);
 	}
 
@@ -391,10 +454,10 @@ int rc;
 	case SQLITE_OK:
 		return(successdb);
 	case SQLITE_BUSY:
-		log("\tdb is busy", SQLITER_ERROR_NONE,rc);
+		log("\tcompilesql failed, db is busy", SQLITER_ERROR_NONE,rc);
 		return(busydberror);
 	default:
-		log("\tfailed sqlite3_prepare_v2", SQLITER_ERROR_COMPILESQL_FAILEDPREPARE,rc);
+		log("\tcompilesql failed, failed sqlite3_prepare_v2", SQLITER_ERROR_COMPILESQL_FAILEDPREPARE,rc);
 		return(otherdberror);
 	}
 }
@@ -413,7 +476,7 @@ unsigned int i;
 	rval = compilesql();
 	if (rval != successdb) {
 		finalizestatement();
-		log("\tcompilesql failed", SQLITER_ERROR_COMPILESTATEMENT_FAILCOMPILESQL,rval);
+		log("\tcompilestatement failed", SQLITER_ERROR_COMPILESTATEMENT_FAILCOMPILESQL,rval);
 		return(rval);
 	}
 
@@ -421,7 +484,7 @@ unsigned int i;
 		rslt = bindparameter(valsin[i]);
 		if (rslt) {
 			finalizestatement();
-			log("\tbind error\n", SQLITER_ERROR_COMPILESTATEMENT_FAILBIND,rslt);
+			log("\tcompilestatment failed, bind error\n", SQLITER_ERROR_COMPILESTATEMENT_FAILBIND,rslt);
 			return(binddberror);
 		}
 	}
@@ -441,6 +504,7 @@ dbresulttype rval;
 		//}
 		rval = compilestatement();
 		if (rval) {
+			log("\trunstep failed, compilestatement.");
 			return(rval);
 		}
 		statementdirty = false;
@@ -458,7 +522,7 @@ dbresulttype rval;
 		return(rowresultdb);
 		break;
 	default:
-		log("\tstepstatement failed",SQLITER_ERROR_RUNSTEP_FAILSTEPSTATEMENT,rval);
+		log("\trunstep failed, stepstatement failed",SQLITER_ERROR_RUNSTEP_FAILSTEPSTATEMENT,rval);
 		return(rval);
 	}
 	
@@ -474,7 +538,7 @@ int i;
 int pos;
 	log("stepstatement\n");
 	if (db == NULL) {
-		log("\tdb null",SQLITER_ERROR_STEPSTATEMENT_DBNULL,0);
+		log("\tstepstatment failed, db null",SQLITER_ERROR_STEPSTATEMENT_DBNULL,0);
 		return(otherdberror);
 	}
 
@@ -484,7 +548,7 @@ int pos;
 
 	switch (rc) {
 	case SQLITE_BUSY:
-		log("\tdb is busy\n",SQLITER_ERROR_NONE, 0);
+		log("\tstepstatement failed, db is busy\n",SQLITER_ERROR_NONE, 0);
 		return(busydberror);
 	case SQLITE_DONE:
 		lastinsertrowid = sqlite3_last_insert_rowid(db);
@@ -494,7 +558,7 @@ int pos;
 		if (numout != valtypesout.size()) {
 			if (options.valcountmismatchcausesfailure) {
 				valcountandtypesmatch = false;
-				log("\tresult count wrong\n",SQLITER_ERROR_NONE,0);
+				log("\tstepstatement failed, result count wrong\n",SQLITER_ERROR_NONE,0);
 				return(resultcountmismatchdberror);
 			}
 		}
@@ -511,7 +575,7 @@ int pos;
 						if (options.nullisavaltypemismatch) {
 							//...and if, should the type be returned is null, then is it a permitted or a not
 							//	permitted null to find in a field like an INT or TEXT?
-							log("\tresult types wrong for a null value\n",SQLITER_ERROR_NONE,0);
+							log("\tstepstatement failed, result types wrong for a null value\n",SQLITER_ERROR_NONE,0);
 							valcountandtypesmatch = false;
 							return(resulttypemismatchdberror);}
 						else {
@@ -522,7 +586,7 @@ int pos;
 							//OK, fall back out of the conditionals and process as regular data.
 						}
 					} else {
-						log("\tresult types wrong for non-null value\n",SQLITER_ERROR_NONE,0);
+						log("\tstepstatement failed, result types wrong for non-null value\n",SQLITER_ERROR_NONE,0);
 						return(resulttypemismatchdberror);
 					}
 				}
@@ -559,13 +623,13 @@ int pos;
 				rowdata[i].sval = "";
 				break;
 			default:
-				log("\tUnknown type",SQLITER_ERROR_STEPSTATEMENT_BADTYPE, 0);
+				log("\tstepstatment failed, Unknown type",SQLITER_ERROR_STEPSTATEMENT_BADTYPE, 0);
 				return(otherdberror);
 			}
 		}
 		return(rowresultdb);
 	default:
-		log("\tsqlite3_step failed",SQLITER_ERROR_STEPSTATEMENT_FAILSQLITE3STEP,rc);
+		log("\tstepstatement failed, sqlite3_step failed",SQLITER_ERROR_STEPSTATEMENT_FAILSQLITE3STEP,rc);
 		return(otherdberror);
 	}
 
@@ -573,7 +637,13 @@ int pos;
 
 dbresulttype csqliter::runsinglestepstatement() {
 	int rval;
-	return(runsinglestepstatement(rval));
+	dbresulttype rslt;
+	log("runsinglestepstatement()");
+	rslt = runsinglestepstatement(rval);
+	if (rslt) {
+		log("\trunsinglestepstatement failed, Failure in runsinglestepstatement(int &) at runsinglestepstatement(int)");
+	}
+	return(rslt);
 }
 
 dbresulttype csqliter::runsinglestepstatement(int &numresultrowsreturned) {
@@ -582,7 +652,7 @@ dbresulttype csqliter::runsinglestepstatement(int &numresultrowsreturned) {
 dbvals firstrow;
 dbresulttype rval;
 int count;
-	log("runsinglestepstatment with rslt\n");
+	log("runsinglestepstatment(int &)");
 	count = 0;
 	
 	switch((rval=runstep())) {
@@ -604,7 +674,7 @@ int count;
 		}
 		break;
 	default:
-		log("\trunstep failed\n",SQLITER_ERROR_RUNSINGLESTEPSTATEMENT_FAILED_RUNSTEP,0);
+		log("\trunsinglestestatement failed, runstep failed\n",SQLITER_ERROR_RUNSINGLESTEPSTATEMENT_FAILED_RUNSTEP,0);
 		return(rval);
 	}
 
@@ -615,12 +685,12 @@ int csqliter::finalizestatement() {
 	valtypesout.resize(0);
 	log("finalizestatement\n");
 	if (db == NULL) {
-		log("\tdb is null",SQLITER_ERROR_FINALIZESTATEMENT_DBNULL,0);
+		log("\tfinalizestatement failed, db is null",SQLITER_ERROR_FINALIZESTATEMENT_DBNULL,0);
 		return(1);
 	}
 
 	if (litestmnt == NULL) {
-		log("\tstatement is already null");//not actually an error
+		log("\tfinalizestatement failed, statement is already null");//not actually an error
 		return(0);
 	}
 	sqlite3_finalize(litestmnt);
@@ -631,6 +701,7 @@ int csqliter::finalizestatement() {
 
 dbresulttype csqliter::closedb() {
 int rc;
+	log("closedb()");
 	if (litestmnt != NULL) {
 		sqlite3_finalize(litestmnt);
 	}
@@ -638,10 +709,9 @@ int rc;
 	db = NULL;
 	switch (rc) {
 	case SQLITE_OK:
-		log("closedb");log("\tok");
 		return(successdb);
 	default:
-		log("closedb");log("\tsqlite3_close failed",SQLITER_ERROR_CLOSEDB_FAILSQLITE3CLOSE,rc);
+		log("\tsqlite3_close failed",SQLITER_ERROR_CLOSEDB_FAILSQLITE3CLOSE,rc);
 		return(otherdberror);
 	}
 }
@@ -653,6 +723,7 @@ inline void csqliter::log(std::string &str) {
 inline void csqliter::log(const char *str) {
 	if (logfile.good()) {
 		logfile << str;
+		logfile << "\n";
 	}
 }
 
@@ -683,32 +754,35 @@ inline void csqliter::log(const char *str, int sqliter_errorcode, int sqlite_err
 }
 
 int csqliter::startlog(const char *fullpath) {
-	std::string fp;
+int rval;
+
+std::string fp;
 	fp = fullpath;
-	return(startlog(fp));
+	rval = startlog(fp);
+	if (rval) {
+		log("Failure in startlog(const char *fullpath) at startlog(std::string)");
+	}
+	return(rval);
 }
 
 int csqliter::startlog(std::string &fullpath) {
 	log("opening log file - WHILE ALREADY OPEN\n\t");
-	log(fullpath.c_str());
-	log("\n");
+	//log(fullpath.c_str());
+	//log("\n");
 	logfile.open(fullpath.c_str());
+	log("startlog");
 
 	if (!(logfile.good())) {
 		log("\tfailed ofstream.open",SQLITER_ERROR_STARTLOG_FAILOPEN,0);
 		return(1);
 	}
 
-	log("startlog\n\t");
-	log(fullpath.c_str());
-	log("\n");
-
 	return(0);
 
 }
 
 void csqliter::stoplog() {
-	log("stoplog.\n");
+	log("stoplog");
 	logfile.close();
 }
 
@@ -719,10 +793,12 @@ csqliteroptions::csqliteroptions(void) {
 }
 
 void csqliteroptions::setvaltypemismatchcausesfailure(bool mismatchisfailure) {
+	log("setvaltypemismatchcausesfailure(bool)");
 	valtypemismatchcausesfailure = mismatchisfailure;
 }
 
 void csqliteroptions::setvalcountmismatchcausesfailure(bool mismatchisfailure) {
+	log("setvalcountmismatchcausesfailure(bool)");
 	valcountmismatchcausesfailure = mismatchisfailure;
 }
 
