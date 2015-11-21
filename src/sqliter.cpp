@@ -793,12 +793,12 @@ csqliteroptions::csqliteroptions(void) {
 }
 
 void csqliteroptions::setvaltypemismatchcausesfailure(bool mismatchisfailure) {
-	log("setvaltypemismatchcausesfailure(bool)");
+	//log("setvaltypemismatchcausesfailure(bool)");
 	valtypemismatchcausesfailure = mismatchisfailure;
 }
 
 void csqliteroptions::setvalcountmismatchcausesfailure(bool mismatchisfailure) {
-	log("setvalcountmismatchcausesfailure(bool)");
+	//log("setvalcountmismatchcausesfailure(bool)");
 	valcountmismatchcausesfailure = mismatchisfailure;
 }
 
