@@ -7,8 +7,8 @@ csqliter::csqliter(void)
 {
 	db = NULL;
 	litestmnt = NULL;
+	options.logfile = &logfile;
 }
-
 
 csqliter::~csqliter(void)
 {
@@ -793,12 +793,12 @@ csqliteroptions::csqliteroptions(void) {
 }
 
 void csqliteroptions::setvaltypemismatchcausesfailure(bool mismatchisfailure) {
-	//log("setvaltypemismatchcausesfailure(bool)");
+	*logfile << "options.setvaltypemismatchcausesfailure " << mismatchisfailure << "\n";
 	valtypemismatchcausesfailure = mismatchisfailure;
 }
 
 void csqliteroptions::setvalcountmismatchcausesfailure(bool mismatchisfailure) {
-	//log("setvalcountmismatchcausesfailure(bool)");
+	*logfile << "options.setvalcountmismatchcausesfailure " << mismatchisfailure << "\n";
 	valcountmismatchcausesfailure = mismatchisfailure;
 }
 
