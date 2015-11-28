@@ -7,6 +7,7 @@
 
 #include "sqlitertestfileoperations.h"
 #include "sqlitertestdataaccess.h"
+#include "sqlitertestbind.h"
 
 #define TEST_PATH "./"
 
@@ -66,6 +67,13 @@ int main()
 	rval = testaccess.testresponseargtypeserror();
 	if (rval) {
 		return(7);
+	}
+
+	csqlitertestbind testbind;
+	path = TEST_PATH;
+	rval = testbind.testeachtypeofbind();
+	if (rval) {
+		return(8);
 	}
 
 	std::cout << "tests successful\r\n";

@@ -67,12 +67,14 @@
     <ClCompile Include="..\..\..\src\sqlite3.c" />
     <ClCompile Include="..\..\..\src\sqliter.cpp" />
     <ClCompile Include="..\..\sqlitertest.cpp" />
+    <ClCompile Include="..\..\sqlitertestbind.cpp" />
     <ClCompile Include="..\..\sqlitertestdataaccess.cpp" />
     <ClCompile Include="..\..\sqlitertestfileoperations.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\sqlite3.h" />
     <ClInclude Include="..\..\..\src\sqliter.h" />
+    <ClInclude Include="..\..\sqlitertestbind.h" />
     <ClInclude Include="..\..\sqlitertestdataaccess.h" />
     <ClInclude Include="..\..\sqlitertestfileoperations.h" />
   </ItemGroup>

@@ -30,6 +30,9 @@
     <ClInclude Include="..\..\sqlitertestfileoperations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\sqlitertestbind.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -48,6 +51,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\sqlitertestfileoperations.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sqlitertestbind.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

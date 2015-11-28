@@ -145,6 +145,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\sqlitertestbind.h" />
     <ClInclude Include="..\..\sqlitertestdataaccess.h" />
     <ClInclude Include="..\..\sqlitertestfileoperations.h" />
     <ClInclude Include="stdafx.h" />
@@ -154,6 +155,7 @@
     <ClCompile Include="..\..\..\src\sqlite3.c" />
     <ClCompile Include="..\..\..\src\sqliter.cpp" />
     <ClCompile Include="..\..\sqlitertest.cpp" />
+    <ClCompile Include="..\..\sqlitertestbind.cpp" />
     <ClCompile Include="..\..\sqlitertestdataaccess.cpp" />
     <ClCompile Include="..\..\sqlitertestfileoperations.cpp" />
     <ClCompile Include="stdafx.cpp" />
