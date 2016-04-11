@@ -7,8 +7,8 @@ csqliter::csqliter(void)
 {
 	db = NULL;
 	litestmnt = NULL;
-	options.logfile = &logfile;
 }
+
 
 csqliter::~csqliter(void)
 {
@@ -658,6 +658,7 @@ int count;
 	switch((rval=runstep())) {
 	case successdb:
 		//it worked and returned no results
+		numresultrowsreturned = 0;
 		return(successdb);
 		break;
 	case rowresultdb:
@@ -793,12 +794,12 @@ csqliteroptions::csqliteroptions(void) {
 }
 
 void csqliteroptions::setvaltypemismatchcausesfailure(bool mismatchisfailure) {
-	*logfile << "options.setvaltypemismatchcausesfailure " << mismatchisfailure << "\n";
+	//log("setvaltypemismatchcausesfailure(bool)");
 	valtypemismatchcausesfailure = mismatchisfailure;
 }
 
 void csqliteroptions::setvalcountmismatchcausesfailure(bool mismatchisfailure) {
-	*logfile << "options.setvalcountmismatchcausesfailure " << mismatchisfailure << "\n";
+	//log("setvalcountmismatchcausesfailure(bool)");
 	valcountmismatchcausesfailure = mismatchisfailure;
 }
 

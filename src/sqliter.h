@@ -76,7 +76,6 @@ protected:
 	bool valtypemismatchcausesfailure;
 	bool nullisavaltypemismatch; // For purposes of ValTypeMismatchCausesFailure, if the nominal type is Int (or TEXT, etc.) is Null a type mismatch?
 	bool valcountmismatchcausesfailure;
-	std::ofstream *logfile;//shared in from the csqliter which owns this instance
 };
 
 class csqliter
